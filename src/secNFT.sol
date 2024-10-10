@@ -12,11 +12,6 @@ contract SecureNFT is ERC721, ERC2981, Ownable {
         _tokenURIs[tokenId] = _tokenURI;
     }
 
-    function mint(address to, uint256 tokenId, string memory _tokenURI) public onlyOwner {
-        _mint(to, tokenId);
-        _setTokenURI(tokenId, _tokenURI);
-    }
-
     constructor(uint64 subscriptionId, address vrfCoordinatorV2Address) VRFConsumerBaseV2(vrfCoordinatorV2Address) {
         _subscriptionId = subscriptionId;
         CoordinatorInterface = VRFCoordinatorV2Interface(vrfCoordinatorV2Address);
@@ -41,12 +36,13 @@ contract SecureNFT is ERC721, ERC2981, Ownable {
     uint256 private nonce;
     function mint() public {
         uint256 tokenId = uint256(keccak256(abi.encodePacked(
-            blockhash(number - 1),
+            blockhash(number),
             msg.sender,
             nonce
         )));
         nonce++;
         _mint(msg.sender, tokenId);
+        _setTokenURI(tokenId, _tokenURI);
     }
 
     mapping(address => uint256) private balances;
